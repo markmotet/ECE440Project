@@ -23,14 +23,19 @@ typedef struct __attribute__((__packed__)) {
     unsigned int biClrImportant;
 } BITMAPINFOHEADER;
 
-
 int main(void) {                                                                                                                                                                                                                             
     BITMAPFILEHEADER fh;                                                                                                                                                                                                                           
     BITMAPINFOHEADER ih;                                                                                                                                                                                                                           
     FILE *img = fopen("terraria.bmp", "rb");
     fread(&fh, sizeof(unsigned char), sizeof(BITMAPFILEHEADER), img);
     fread(&ih, sizeof(unsigned char), sizeof(BITMAPINFOHEADER), img);
-    printf("type = %c, , bfS = %u, un1 = %hu, un2 = %hu, iDO = %u\n", fh.bfType, fh.bfSize, fh.bfReserved1, fh.bfReserved2, fh.bfOffBits);                                                                         
-    printf("w = %d, h = %d\n", ih.biWidth, ih.biHeight);
+
+
+    printf("---------- BMP METADATA ----------\n");
+    printf("FILE SIZE:   %u bytes\n", fh.bfSize);                                                                         
+    printf("DATA OFFSET: %u bytes\n", fh.bfOffBits);                                                                         
+    printf("WIDTH:       %d px\n", ih.biWidth);
+    printf("HEIGHT:      %d px\n", ih.biHeight);
+    printf("----------------------------------\n");
     return 0;
 }
