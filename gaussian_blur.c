@@ -23,6 +23,12 @@ typedef struct __attribute__((__packed__)) {
     unsigned int biClrImportant;
 } BITMAPINFOHEADER;
 
+typedef struct {
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+} RGB;
+
 int main(void) {                                                                                                                                                                                                                             
     BITMAPFILEHEADER fh;                                                                                                                                                                                                                           
     BITMAPINFOHEADER ih;                                                                                                                                                                                                                           
@@ -39,3 +45,5 @@ int main(void) {
     printf("----------------------------------\n");
     return 0;
 }
+
+
