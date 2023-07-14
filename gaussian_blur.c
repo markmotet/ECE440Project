@@ -31,10 +31,15 @@ typedef struct {
 
 // Create a Gaussian kernel.
 // For simplicity we are going to create a 3x3 kernel.
-float kernel[3][3] = {
-    {1.0/16, 2.0/16, 1.0/16},
-    {2.0/16, 4.0/16, 2.0/16},
-    {1.0/16, 2.0/16, 1.0/16}
+
+
+// Initially, this is the only place that has a float so that I will convert it to an integer using fixed-point arithmetic for better performance
+// For this problem, unsigned shorts can work, so we can scale the number to have 16 bits for the fractional part. So we can use 2^16 as the scale factor.
+
+unsigned short kernel[3][3] = {
+    {1.0/16 * 65536, 2.0/16 * 65536, 1.0/16 * 65536},
+    {2.0/16 * 65536, 4.0/16 * 65536, 2.0/16 * 65536},
+    {1.0/16 * 65536, 2.0/16 * 65536, 1.0/16 * 65536}
 };
 
 int main(void) {
@@ -74,9 +79,9 @@ int main(void) {
                 }
             }
 
-            newPixelData[y * ih.biWidth + x].r = (unsigned char) r;
-            newPixelData[y * ih.biWidth + x].g = (unsigned char) g;
-            newPixelData[y * ih.biWidth + x].b = (unsigned char) b;
+            newPixelData[y * ih.biWidth + x].r = (unsigned char) (r >> 16);
+            newPixelData[y * ih.biWidth + x].g = (unsigned char) (g >> 16);
+            newPixelData[y * ih.biWidth + x].b = (unsigned char) (b >> 16);
         }
     }
 
