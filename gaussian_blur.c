@@ -33,13 +33,15 @@ typedef struct {
 // For simplicity we are going to create a 3x3 kernel.
 
 
-// Initially, this is the only place that has a float so that I will convert it to an integer using fixed-point arithmetic for better performance
-// For this problem, unsigned shorts can work, so we can scale the number to have 16 bits for the fractional part. So we can use 2^16 as the scale factor.
+// We are using a Gaussian kernel for image blurring. The kernel originally contained floating point values.
+// To improve performance, we use fixed-point arithmetic by converting these floating point values to integers.
+// We chose unsigned short as the data type and scaled the original floating point values by a factor of 2^16 (or 65536).
+// This allows us to represent the fractional part of the original floating point values in the lower 16 bits of the unsigned short.
 
 unsigned short kernel[3][3] = {
-    {1.0/16 * 65536, 2.0/16 * 65536, 1.0/16 * 65536},
-    {2.0/16 * 65536, 4.0/16 * 65536, 2.0/16 * 65536},
-    {1.0/16 * 65536, 2.0/16 * 65536, 1.0/16 * 65536}
+    {4096, 8192, 4096},
+    {8192, 16384, 8192},
+    {4096, 8192, 4096}
 };
 
 int main(void) {
@@ -64,7 +66,12 @@ int main(void) {
     // Apply the Gaussian kernel to each pixel
     for(int y = 0; y < ih.biHeight; y++) {
         for(int x = 0; x < ih.biWidth; x++) {
-            float r = 0, g = 0, b = 0;
+            // We are accumulating the result of multiplying the pixel values (unsigned char) with the kernel values (unsigned short).
+            // This operation could result in a value that exceeds the maximum value that can be stored in an unsigned char, causing an overflow.
+            // To prevent this, we use unsigned int for r, g, and b which can hold larger values.
+
+            unsigned int r = 0, g = 0, b = 0;  // Change to unsigned int
+            
             for(int ky = -1; ky <= 1; ky++) {
                 for(int kx = -1; kx <= 1; kx++) {
                     int px = x + kx;
@@ -78,6 +85,11 @@ int main(void) {
                     }
                 }
             }
+
+            // After applying the kernel, we divide the accumulated values by the scale factor (2^16) to get back to the original scale.
+            // This is done by right shifting the values by 16 bits.
+            // The result is then cast back to unsigned char when storing it in the newPixelData array.
+
 
             newPixelData[y * ih.biWidth + x].r = (unsigned char) (r >> 16);
             newPixelData[y * ih.biWidth + x].g = (unsigned char) (g >> 16);
